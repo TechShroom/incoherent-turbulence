@@ -1,0 +1,7 @@
+def base = 'incoherent-turbulence'
+rootProject.name = "${base}-parent"
+
+['level-1', 'level-2', 'gui'].each { name ->
+    include name
+    project(":${name}").name = "${base}-${name}"
+}

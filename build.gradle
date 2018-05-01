@@ -1,0 +1,82 @@
+plugins {
+    id "com.techshroom.incise-blue" version "0.0.7" apply false
+ 	id "net.researchgate.release" version "2.6.0"
+}
+
+subprojects {
+    apply plugin: 'com.techshroom.incise-blue'
+    apply plugin: 'java-library'
+
+    version = rootProject.version
+    group = rootProject.group
+    ext.url = rootProject.url
+    ext.organization = rootProject.organization
+
+    inciseBlue {
+        plugins {
+            apt
+            license
+            lwjgl
+            maven
+            util
+        }
+
+        util {
+            javaVersion = '1.8'
+        }
+
+        maven {
+            coords 'TechShroom', 'incoherent-turbulence'
+        }
+
+        lwjgl {
+            lwjglVersion = project.lwjglVersion
+            addDependency '', true
+            addDependency 'opengl', true
+            addDependency 'openal', true
+            addDependency 'glfw', true
+            addDependency 'nanovg', true
+            addDependency 'stb', true
+        }
+    }
+
+    configurations.all {
+       resolutionStrategy {
+         // fail eagerly on version conflict (includes transitive dependencies)
+         // e.g. multiple different versions of the same dependency (group and name are equal)
+         failOnVersionConflict()
+
+         // force certain versions of dependencies (including transitive)
+         force 'com.google.guava:guava:' + guavaVersion
+
+         cacheDynamicVersionsFor 10, 'minutes'
+         // don't cache changing modules at all
+         cacheChangingModulesFor 0, 'seconds'
+       }
+    }
+
+    dependencies {
+        api(group: 'com.google.guava', name: 'guava', version: project.guavaVersion) {
+            exclude group: 'com.google.code.findbugs', module: 'jsr305'
+        }
+
+        api group: 'com.techshroom', name: 'jsr305-plus', version: '0.0.1'
+        implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
+
+        api group: 'org.eclipse.collections', name: 'eclipse-collections-api', version: eclipseCollVersion
+        implementation group: 'org.eclipse.collections', name: 'eclipse-collections', version: eclipseCollVersion
+
+        aptCompileOnly(group: 'com.google.auto.service', name: 'auto-service', version: autoServiceVersion) {
+            exclude group: 'com.google.guava', module: 'guava'
+        }
+
+        compileOnly group: 'com.google.auto.value', name: 'auto-value-annotations', version: autoValueVersion
+        annotationProcessor group: 'com.google.auto.value', name: 'auto-value', version: autoValueVersion
+
+        testImplementation group: 'junit', name: 'junit', version: '4.12'
+    }
+}
+
+task build {}
+build.dependsOn(subprojects.collect { it.build })
+afterReleaseBuild.dependsOn(subprojects.collect { it.uploadArchives })
