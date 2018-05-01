@@ -5,13 +5,10 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
-import org.slf4j.Logger;
-
 import com.techshroom.incoence.l1.ExpandingBuffer;
 
 /**
- * {@link OutputStream} implementation that forwards to a {@link Logger} at a
- * specific level.
+ * {@link OutputStream} implementation that forwards to a {@link LineConsumer}.
  */
 public class LineOutputStream extends OutputStream {
 
