@@ -59,4 +59,9 @@ public class LineOutputStream extends OutputStream {
         String line = StandardCharsets.UTF_8.decode(lineBytes).toString();
         lineConsumer.onLine(line);
     }
+
+    @Override
+    public void close() throws IOException {
+        buffer.free();
+    }
 }
